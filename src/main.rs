@@ -1,6 +1,7 @@
 extern crate ssh2;
 
 pub mod ssh;
+pub mod word;
 
 use std::net::{TcpStream};
 use ssh2::{Session, DisconnectCode};

@@ -3,19 +3,50 @@ extern crate ssh2;
 pub mod ssh;
 pub mod word;
 
-use std::net::{TcpStream};
-use ssh2::{Session, DisconnectCode};
-//use ssh::checker;
+use word::gen;
+use ssh::{checker, port};
 
 fn main() {
-    let tcp = TcpStream::connect("52.30.167.110:22").unwrap();
-    let mut sess = Session::new().unwrap();
+    match port::scan("localhost", "22") {
+        Some(err) => panic!(err),
+        None => {},
+    };
 
-    sess.set_tcp_stream(tcp);
-    sess.handshake().unwrap();
-    sess.userauth_password("root", "Tryh4ckm3").unwrap();
-    assert!(sess.authenticated());
+    penetrate()
+}
 
-    // NOTE: doesn't clost the socket
-    sess.disconnect(Some(DisconnectCode::AuthCancelledByUser), "no_reason", None).unwrap();
+fn penetrate() {
+   let mut char_list: Vec<String> = "12345"
+       .split("")
+       .map(|s| String::from(s))
+       .collect::<Vec<String>>();
+
+    char_list.drain(0..1); // remove first space
+    char_list.drain(char_list.len()-1..); // remove last space
+
+    let v = gen::Variations::new(char_list, 4);
+   
+    let mut h = checker::Handler::default();
+    let mut c = checker::Config::default();
+    c.set_host("localhost");
+    h.set_config(c);
+    
+    match h.connect() {
+        Some(err) => panic!(err),
+        None => {},
+    };
+
+    for w in v {
+        match h.check("root", &w[..]) {
+            Err(_) => {},
+            Ok(res) => if res {
+                println!("{}", w);
+            },
+        }
+    }
+
+    match h.disconnect() {
+        Some(err) => panic!(err),
+        None => {},
+    }
 }

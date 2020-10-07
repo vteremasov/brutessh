@@ -78,6 +78,7 @@ impl Handler {
     }
 
     pub fn check(&mut self, username: &str, password: &str) -> Result<bool, Error> {
+        println!("{}", password);
         match self.s.take() {
             None => Err(Error::new("missing session")),
             Some(sess) => {

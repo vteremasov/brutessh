@@ -4,6 +4,7 @@ pub struct Variations {
     state: RefCell<Vec<usize>>,
     char_set: Vec<String>,
     n: usize, // length of the char_set
+    m: usize, // capacity of the state
 
     position: usize, // position counter of the state
 }
@@ -14,6 +15,7 @@ impl Variations {
         s.resize_with(m, || 0);
         Variations {
             n: char_set.len(),
+            m: m,
             state: RefCell::new(s),
             char_set: char_set,
             position: 0,
@@ -39,6 +41,12 @@ impl Iterator for Variations {
             self.position += 1;
         }
 
+        if self.position >= self.m {
+            return None;
+        }
+
+        println!("n: {}, m: {}, position: {}, index: {}", self.n, self.m, self.position, self.state.borrow()[self.position]);
+        
         self.state.borrow_mut()[self.position] += 1;
 
         self.map_state()

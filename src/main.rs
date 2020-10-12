@@ -14,11 +14,13 @@ fn main() {
         None => {},
     };
 
-    penetrate()
+    let settings = cli::Settings::parse();
+
+    penetrate(settings)
 }
 
-fn penetrate() {
-   let mut char_list: Vec<String> = "12345"
+fn penetrate(settings: cli::Settings) {
+   let mut char_list: Vec<String> = settings.char_list
        .split("")
        .map(|s| String::from(s))
        .collect::<Vec<String>>();
@@ -30,7 +32,8 @@ fn penetrate() {
    
     let mut h = checker::Handler::default();
     let mut c = checker::Config::default();
-    c.set_host("localhost");
+    c.set_host(settings.address);
+    c.set_port(settings.port);
     h.set_config(c);
     
     match h.connect() {
@@ -39,7 +42,7 @@ fn penetrate() {
     };
 
     for w in v {
-        match h.check("root", &w[..]) {
+        match h.check(&settings.user[..], &w[..]) {
             Err(_) => {},
             Ok(res) => if res {
                 println!("{}", w);

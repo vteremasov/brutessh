@@ -1,5 +1,7 @@
 extern crate ssh2;
+extern crate clap;
 
+mod cli;
 pub mod ssh;
 pub mod word;
 

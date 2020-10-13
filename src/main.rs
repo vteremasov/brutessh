@@ -2,11 +2,9 @@ extern crate ssh2;
 extern crate clap;
 
 mod cli;
-pub mod ssh;
-pub mod word;
-
-use word::gen;
-use ssh::{checker, port};
+mod ssh;
+mod port;
+mod word;
 
 fn main() {
     match port::scan("localhost", "22") {
@@ -28,10 +26,10 @@ fn penetrate(settings: cli::Settings) {
     char_list.drain(0..1); // remove first space
     char_list.drain(char_list.len()-1..); // remove last space
 
-    let v = gen::Variations::new(char_list, 4);
+    let v = word::Variations::new(char_list, 4);
    
-    let mut h = checker::Handler::default();
-    let mut c = checker::Config::default();
+    let mut h = ssh::Handler::default();
+    let mut c = ssh::Config::default();
     c.set_host(settings.address);
     c.set_port(settings.port);
     h.set_config(c);
